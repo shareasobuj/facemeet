@@ -1,1 +1,1231 @@
 # facemeet
+
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>facemeet (Advanced with Delete)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: orchid;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background: #1877f2;
+      color: white;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .profile-pic {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+      cursor: pointer;
+      position: relative;
+    }
+    .user-name {
+      font-weight: bold;
+      font-size: 18px;
+      flex-grow: 1;
+      user-select: none;
+    }
+    .btn-logout {
+      background: #ff3b30;
+      border: none;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #auth, #loginForm, #mainApp {
+      max-width: 600px;
+      margin: 20px auto;
+      background: yellowgreen;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    input[type="text"], input[type="email"], input[type="password"], textarea, input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    button {
+      background: #1877f2;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      margin-top: 10px;
+      width: 100%;
+      font-size: 16px;
+    }
+    .post, .story, .friend-request, .friend, .chat-box, .notification, .comment, .reply {
+      background: #f5f6f7;
+      margin: 15px 0;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px #aaa;
+      word-wrap: break-word;
+      position: relative;
+    }
+    .post img, .story img, .reply img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    video {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .btn-like, .btn-comment, .btn-reply, .btn-friend {
+      background: #28a745;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-reply {
+      background: #ffc107;
+      color: black;
+    }
+    .btn-accept, .btn-decline {
+      background: #20c997;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-decline {
+      background: #dc3545;
+    }
+    .comments-container, .replies-container {
+      margin-left: 20px;
+      margin-top: 10px;
+    }
+    .story-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+    .story {
+      min-width: 100px;
+      max-width: 100px;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+    }
+    .story img, .story video {
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border: 3px solid #1877f2;
+    }
+    .story .story-name {
+      margin-top: 5px;
+      font-size: 12px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80px;
+    }
+    .story-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #000c;
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      max-width: 90vw;
+      max-height: 90vh;
+    }
+    .story-popup img, .story-popup video {
+      max-width: 80vw;
+      max-height: 70vh;
+      border-radius: 10px;
+    }
+    .story-popup button {
+      margin-top: 10px;
+      padding: 8px 20px;
+      background: #1877f2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .chat-box {
+      padding: 5px;
+    }
+    .chat-messages {
+      height: 150px;
+      overflow-y: auto;
+      background: white;
+      border-radius: 5px;
+      padding: 5px;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    .chat-message {
+      margin: 3px 0;
+      border-radius: 4px;
+      padding: 5px 10px;
+      max-width: 80%;
+      word-wrap: break-word;
+      position: relative;
+    }
+    .chat-message.self {
+      background: #1877f2;
+      color: white;
+      margin-left: auto;
+    }
+    .chat-message.other {
+      background: #f1f0f0;
+      color: black;
+      margin-right: auto;
+    }
+    .chat-input-container {
+      display: flex;
+      gap: 5px;
+    }
+    .chat-input-container input {
+      flex-grow: 1;
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .chat-input-container button {
+      width: 70px;
+      background: #1877f2;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    /* ৩ ডট মেনু স্টাইল */
+    .menu-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 22px;
+      color: #555;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .menu-btn:hover {
+      color: #1877f2;
+    }
+    .menu-content {
+      position: absolute;
+      top: 28px;
+      right: 8px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: none;
+      min-width: 120px;
+    }
+    .menu-content.show {
+      display: block;
+    }
+    .menu-content button {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #333;
+      border-bottom: 1px solid #eee;
+    }
+    .menu-content button:last-child {
+      border-bottom: none;
+    }
+    .menu-content button:hover {
+      background: #1877f2;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <!-- Authentication -->
+  <div id="auth">
+    <h2>facemeet - সাইন আপ</h2>
+    <input type="text" id="signupName" placeholder="নাম" />
+    <input type="email" id="signupEmail" placeholder="ইমেইল" />
+    <input type="password" id="signupPassword" placeholder="পাসওয়ার্ড" />
+    <label>প্রোফাইল ছবি আপলোড করুন:</label>
+    <input type="file" id="signupProfilePic" accept="image/*" />
+    <img id="signupProfilePicPreview" alt="Profile Preview" class="hidden" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-top:10px;" />
+    <button id="btnSignup">সাইন আপ</button>
+    <p>আগে থেকে সদস্য? <a href="#" id="showLoginLink">লগইন করুন</a></p>
+    <div id="signupError" class="error"></div>
+  </div>
+
+  <div id="loginForm" class="hidden">
+    <h2>facemeet - লগইন</h2>
+    <input type="email" id="loginEmail" placeholder="ইমেইল" />
+    <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড" />
+    <button id="btnLogin">লগইন</button>
+    <p>নতুন সদস্য? <a href="#" id="showSignupLink">সাইন আপ করুন</a></p>
+    <div id="loginError" class="error"></div>
+  </div>
+
+  <!-- Main Application -->
+  <div id="mainApp" class="hidden">
+    <div class="header">
+      <img id="headerProfilePic" class="profile-pic" title="প্রোফাইল" />
+      <div class="user-name" id="headerUserName"></div>
+
+      <!-- ৩ ডট মেনু হেডার -->
+      <button id="headerMenuBtn" class="menu-btn" title="Settings">&#x22EE;</button>
+      <div id="headerMenuContent" class="menu-content">
+        <button id="btnLogoutMenu">লগআউট</button>
+      </div>
+    </div>
+
+    <!-- Story Upload -->
+    <div id="storyUploadSection" style="max-width:600px; margin: 20px auto; background:#fff; padding:15px; border-radius:10px; box-shadow:0 0 10px #ccc;">
+      <h3>স্টোরি আপলোড করুন (ছবি বা ভিডিও)</h3>
+      <input type="file" id="storyFileInput" accept="image/*,video/*" />
+      <button id="btnUploadStory">স্টোরি আপলোড করুন</button>
+      <div id="storyUploadError" class="error"></div>
+    </div>
+
+    <!-- Stories -->
+    <div id="storyListSection" style="max-width:600px; margin:20px auto; background:#fff; padding:10px; border-radius:10px; box-shadow:0 0 10px #ccc;">
+      <h3>Stories</h3>
+      <div class="story-list" id="storyList"></div>
+    </div>
+
+    <!-- Post creation -->
+    <div style="max-width:600px; margin:20px auto; background:#fff; padding:15px; border-radius:10px; box-shadow:0 0 10px #ccc;">
+      <h3>নতুন পোস্ট করুন (ছবি/ভিডিও সহ)</h3>
+      <textarea id="postText" placeholder="আপনার পোস্ট লিখুন..."></textarea>
+      <input type="file" id="postFileInput" accept="image/*,video/*" />
+      <button id="btnAddPost">পোস্ট করুন</button>
+      <div id="postError" class="error"></div>
+    </div>
+
+    <!-- Posts -->
+    <div id="postListSection" style="max-width:600px; margin:20px auto;"></div>
+
+    <!-- Friend Requests -->
+    <div style="max-width:600px; margin:20px auto; background:#fff; padding:15px; border-radius:10px; box-shadow:0 0 10px #ccc;">
+      <h3>বন্ধু রিকোয়েস্ট</h3>
+      <input type="email" id="friendEmailInput" placeholder="বন্ধুর ইমেইল দিন" />
+      <button id="btnSendFriendRequest">রিকোয়েস্ট পাঠান</button>
+      <div id="friendRequestList"></div>
+    </div>
+
+    <!-- Friends List -->
+    <div style="max-width:600px; margin:20px auto; background:#fff; padding:15px; border-radius:10px; box-shadow:0 0 10px #ccc;">
+      <h3>বন্ধুদের তালিকা</h3>
+      <div id="friendList"></div>
+    </div>
+
+    <!-- Chat -->
+    <div style="max-width:600px; margin:20px auto; background:#fff; padding:15px; border-radius:10px; box-shadow:0 0 10px #ccc;">
+      <h3>Messenger</h3>
+      <div id="chatFriendSelect"></div>
+      <div id="chatBox" class="hidden">
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input-container">
+          <input type="text" id="chatInput" placeholder="Message..." />
+          <button id="btnSendChat">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div style="max-width:600px; margin:20px auto; background:#fff; padding:15px; border-radius:10px; box-shadow:0 0 10px #ccc;">
+      <h3>Notifications</h3>
+      <div id="notificationList"></div>
+    </div>
+  </div>
+
+  <!-- Story popup -->
+  <div id="storyPopup" class="story-popup">
+    <div id="storyPopupContent"></div>
+    <button id="btnCloseStory">Close</button>
+  </div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const toBase64 = file => new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = () => res(reader.result);
+    reader.onerror = () => rej(reader.error);
+    reader.readAsDataURL(file);
+  });
+
+  // Storage keys
+  const STORAGE_USERS = 'facemeet_users';
+  const STORAGE_LOGGED = 'facemeet_logged';
+  const STORAGE_STORIES = 'facemeet_stories';
+  const STORAGE_POSTS = 'facemeet_posts';
+  const STORAGE_FRIEND_REQUESTS = 'facemeet_friend_requests';
+  const STORAGE_FRIENDS = 'facemeet_friends';
+  const STORAGE_CHATS = 'facemeet_chats';
+  const STORAGE_NOTIFICATIONS = 'facemeet_notifications';
+
+  let currentUser = null;
+  let currentChatFriend = null;
+
+  // --- AUTH ---
+
+  const loadUsers = () => JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
+  const saveUsers = (users) => localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
+  const getUserByEmail = (email) => loadUsers().find(u => u.email === email);
+
+  const saveLoggedUser = (user) => {
+    currentUser = user;
+    localStorage.setItem(STORAGE_LOGGED, JSON.stringify(user));
+  };
+  const loadLoggedUser = () => JSON.parse(localStorage.getItem(STORAGE_LOGGED));
+  const clearLoggedUser = () => {
+    currentUser = null;
+    localStorage.removeItem(STORAGE_LOGGED);
+  };
+
+  // Signup
+  $('signupProfilePic').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) {
+      $('signupProfilePicPreview').classList.add('hidden');
+      return;
+    }
+    toBase64(file).then(data => {
+      $('signupProfilePicPreview').src = data;
+      $('signupProfilePicPreview').classList.remove('hidden');
+    });
+  });
+
+  $('btnSignup').addEventListener('click', async () => {
+    const name = $('signupName').value.trim();
+    const email = $('signupEmail').value.trim().toLowerCase();
+    const password = $('signupPassword').value;
+    const picSrc = $('signupProfilePicPreview').src || '';
+
+    if (!name || !email || !password) {
+      $('signupError').innerText = 'সব ফিল্ড পূরণ করুন';
+      return;
+    }
+    if (getUserByEmail(email)) {
+      $('signupError').innerText = 'এই ইমেইল ইতিমধ্যে ব্যবহার হচ্ছে';
+      return;
+    }
+    $('signupError').innerText = '';
+
+    const users = loadUsers();
+    users.push({ name, email, password, profilePic: picSrc });
+    saveUsers(users);
+    alert('সাইন আপ সম্পন্ন! এখন লগইন করুন।');
+    showLogin();
+  });
+
+  // Login
+  $('btnLogin').addEventListener('click', () => {
+    const email = $('loginEmail').value.trim().toLowerCase();
+    const password = $('loginPassword').value;
+    const user = getUserByEmail(email);
+    if (!user || user.password !== password) {
+      $('loginError').innerText = 'ইমেইল বা পাসওয়ার্ড ভুল';
+      return;
+    }
+    $('loginError').innerText = '';
+    saveLoggedUser(user);
+    renderApp();
+  });
+
+  // Show login/signup toggles
+  $('showLoginLink').addEventListener('click', e => {
+    e.preventDefault();
+    showLogin();
+  });
+  $('showSignupLink').addEventListener('click', e => {
+    e.preventDefault();
+    showSignup();
+  });
+
+  function showLogin() {
+    $('auth').classList.add('hidden');
+    $('loginForm').classList.remove('hidden');
+  }
+  function showSignup() {
+    $('auth').classList.remove('hidden');
+    $('loginForm').classList.add('hidden');
+  }
+
+  // Logout menu and button
+  $('headerMenuBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    toggleMenu($('headerMenuContent'));
+  });
+  $('btnLogoutMenu').addEventListener('click', () => {
+    clearLoggedUser();
+    location.reload();
+  });
+  // Close menus on outside click
+  document.addEventListener('click', () => {
+    closeAllMenus();
+  });
+  function closeAllMenus() {
+    document.querySelectorAll('.menu-content').forEach(menu => {
+      menu.classList.remove('show');
+    });
+  }
+  function toggleMenu(menu) {
+    const isShown = menu.classList.contains('show');
+    closeAllMenus();
+    if (!isShown) menu.classList.add('show');
+  }
+
+  // --- MAIN APP ---
+
+  function renderApp() {
+    if (!currentUser) return;
+
+    $('auth').classList.add('hidden');
+    $('loginForm').classList.add('hidden');
+    $('mainApp').classList.remove('hidden');
+
+    // Header
+    $('headerUserName').innerText = currentUser.name;
+    $('headerProfilePic').src = currentUser.profilePic || 'https://via.placeholder.com/50';
+
+    loadStories();
+    loadPosts();
+    loadFriendRequests();
+    loadFriends();
+    loadNotifications();
+    renderFriendChatSelect();
+  }
+
+  // --- STORIES ---
+
+  $('btnUploadStory').addEventListener('click', async () => {
+    const file = $('storyFileInput').files[0];
+    if (!file) {
+      alert('ছবি বা ভিডিও নির্বাচন করুন।');
+      return;
+    }
+    try {
+      const dataUrl = await toBase64(file);
+      const stories = JSON.parse(localStorage.getItem(STORAGE_STORIES) || '[]');
+      const story = {
+        id: Date.now(),
+        userEmail: currentUser.email,
+        userName: currentUser.name,
+        userPic: currentUser.profilePic,
+        type: file.type.startsWith('video') ? 'video' : 'image',
+        data: dataUrl,
+        timestamp: Date.now(),
+      };
+      stories.push(story);
+      localStorage.setItem(STORAGE_STORIES, JSON.stringify(stories));
+      $('storyFileInput').value = '';
+      loadStories();
+      addNotification(`${currentUser.name} নতুন স্টোরি শেয়ার করেছেন`);
+    } catch (err) {
+      alert('ফাইল আপলোডে সমস্যা হয়েছে।');
+    }
+  });
+
+  function loadStories() {
+    const storyList = $('storyList');
+    storyList.innerHTML = '';
+    const stories = JSON.parse(localStorage.getItem(STORAGE_STORIES) || '[]');
+    const now = Date.now();
+    const recentStories = stories.filter(s => now - s.timestamp < 24 * 60 * 60 * 1000);
+    recentStories.forEach(story => {
+      const div = document.createElement('div');
+      div.className = 'story';
+      div.title = story.userName + " স্টোরি";
+
+      div.innerHTML = `
+        ${story.type === 'video' ? `<video src="${story.data}" muted preload="metadata" loop></video>` : `<img src="${story.data}" alt="story image"/>`}
+        <div class="story-name">${story.userName}</div>
+        <button class="menu-btn story-menu-btn" title="Options">&#x22EE;</button>
+        <div class="menu-content story-menu-content">
+          <button class="delete-story-btn" data-id="${story.id}">ডিলিট</button>
+        </div>
+      `;
+      storyList.appendChild(div);
+    });
+    attachStoryMenuListeners();
+  }
+
+  function attachStoryMenuListeners() {
+    document.querySelectorAll('.story .story-menu-btn').forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        toggleMenu(btn.nextElementSibling);
+      };
+    });
+    document.querySelectorAll('.delete-story-btn').forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        const id = Number(btn.dataset.id);
+        if (confirm('আপনি কি এই স্টোরি ডিলিট করতে চান?')) {
+          deleteStory(id);
+        }
+        closeAllMenus();
+      };
+    });
+  }
+
+  function deleteStory(id) {
+    let stories = JSON.parse(localStorage.getItem(STORAGE_STORIES) || '[]');
+    stories = stories.filter(s => s.id !== id);
+    localStorage.setItem(STORAGE_STORIES, JSON.stringify(stories));
+    loadStories();
+    addNotification(`${currentUser.name} একটি স্টোরি ডিলিট করেছেন`);
+  }
+
+  // Story popup
+  const storyPopup = $('storyPopup');
+  const storyPopupContent = $('storyPopupContent');
+  $('btnCloseStory').addEventListener('click', () => {
+    storyPopup.style.display = 'none';
+    storyPopupContent.innerHTML = '';
+  });
+
+  function openStoryPopup(story) {
+    storyPopup.style.display = 'flex';
+    if (story.type === 'video') {
+      storyPopupContent.innerHTML = `<video src="${story.data}" controls autoplay></video>`;
+    } else {
+      storyPopupContent.innerHTML = `<img src="${story.data}" alt="story image"/>`;
+    }
+  }
+
+  // --- POSTS ---
+
+  $('btnAddPost').addEventListener('click', async () => {
+    const text = $('postText').value.trim();
+    const file = $('postFileInput').files[0];
+    if (!text && !file) {
+      alert('কিছু লিখুন অথবা ছবি/ভিডিও আপলোড করুন।');
+      return;
+    }
+
+    let dataUrl = '';
+    let type = '';
+    if (file) {
+      try {
+        dataUrl = await toBase64(file);
+        type = file.type.startsWith('video') ? 'video' : 'image';
+      } catch {
+        alert('ফাইল আপলোডে সমস্যা হয়েছে।');
+        return;
+      }
+    }
+
+    const posts = JSON.parse(localStorage.getItem(STORAGE_POSTS) || '[]');
+    posts.unshift({
+      id: Date.now(),
+      userEmail: currentUser.email,
+      userName: currentUser.name,
+      profilePic: currentUser.profilePic,
+      text,
+      media: dataUrl,
+      mediaType: type,
+      timestamp: Date.now(),
+      likes: 0,
+      comments: []
+    });
+    localStorage.setItem(STORAGE_POSTS, JSON.stringify(posts));
+    $('postText').value = '';
+    $('postFileInput').value = '';
+    loadPosts();
+    addNotification(`${currentUser.name} একটি নতুন পোস্ট করেছেন`);
+  });
+
+  function loadPosts() {
+    const postListSection = $('postListSection');
+    postListSection.innerHTML = '';
+    const posts = JSON.parse(localStorage.getItem(STORAGE_POSTS) || '[]');
+    if(posts.length === 0){
+      postListSection.innerHTML = '<p style="text-align:center;">কোনো পোস্ট নেই</p>';
+      return;
+    }
+    posts.forEach(post => {
+      const div = document.createElement('div');
+      div.className = 'post';
+      div.innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px; position:relative;">
+          <img src="${post.profilePic || 'https://via.placeholder.com/40'}" alt="profile" class="profile-pic" style="width:40px; height:40px; cursor:pointer;" />
+          <b>${post.userName}</b>
+          <small style="margin-left:auto; font-size:12px; color:#555;">${new Date(post.timestamp).toLocaleString()}</small>
+
+          <button class="menu-btn post-menu-btn" title="Options">&#x22EE;</button>
+          <div class="menu-content post-menu-content">
+            ${post.userEmail === currentUser.email ? `<button class="delete-post-btn" data-id="${post.id}">ডিলিট</button>` : ''}
+          </div>
+        </div>
+        <p>${post.text.replace(/\n/g, '<br>')}</p>
+        ${post.mediaType === 'image' ? `<img src="${post.media}" alt="post image" />` : ''}
+        ${post.mediaType === 'video' ? `<video src="${post.media}" controls></video>` : ''}
+        <div class="btn-group" style="margin-top:10px;">
+          <button class="btn-like" data-id="${post.id}">❤️ লাইক (${post.likes})</button>
+          <button class="btn-comment" data-id="${post.id}">💬 কমেন্ট (${post.comments.length})</button>
+        </div>
+        <div class="comments-container hidden" id="comments-${post.id}"></div>
+      `;
+      postListSection.appendChild(div);
+    });
+    attachPostListeners();
+    attachPostMenuListeners();
+  }
+
+  function attachPostMenuListeners() {
+    document.querySelectorAll('.post .post-menu-btn').forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        toggleMenu(btn.nextElementSibling);
+      };
+    });
+    document.querySelectorAll('.delete-post-btn').forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        const id = Number(btn.dataset.id);
+        if (confirm('আপনি কি এই পোস্ট ডিলিট করতে চান?')) {
+          deletePost(id);
+        }
+        closeAllMenus();
+      };
+    });
+  }
+
+  function deletePost(id) {
+    let posts = JSON.parse(localStorage.getItem(STORAGE_POSTS) || '[]');
+    posts = posts.filter(p => p.id !== id);
+    localStorage.setItem(STORAGE_POSTS, JSON.stringify(posts));
+    loadPosts();
+    addNotification(`${currentUser.name} একটি পোস্ট ডিলিট করেছেন`);
+  }
+
+  function attachPostListeners() {
+    document.querySelectorAll('.btn-like').forEach(btn => {
+      btn.onclick = () => {
+        const postId = Number(btn.dataset.id);
+        toggleLike(postId);
+      };
+    });
+    document.querySelectorAll('.btn-comment').forEach(btn => {
+      btn.onclick = () => {
+        const postId = Number(btn.dataset.id);
+        toggleComments(postId);
+      };
+    });
+  }
+
+  function toggleLike(postId) {
+    const posts = JSON.parse(localStorage.getItem(STORAGE_POSTS) || '[]');
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+    post.likes++;
+    localStorage.setItem(STORAGE_POSTS, JSON.stringify(posts));
+    loadPosts();
+    addNotification(`${currentUser.name} একটি পোস্টে লাইক দিয়েছেন`);
+  }
+
+  function toggleComments(postId) {
+    const commentsContainer = $(`comments-${postId}`);
+    if (!commentsContainer) return;
+    if (commentsContainer.classList.contains('hidden')) {
+      commentsContainer.classList.remove('hidden');
+      loadComments(postId);
+    } else {
+      commentsContainer.classList.add('hidden');
+    }
+  }
+
+  // --- COMMENTS & REPLIES ---
+
+  function loadComments(postId) {
+    const commentsContainer = $(`comments-${postId}`);
+    if (!commentsContainer) return;
+    const posts = JSON.parse(localStorage.getItem(STORAGE_POSTS) || '[]');
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+    commentsContainer.innerHTML = '';
+    post.comments.forEach((comment, i) => {
+      const div = document.createElement('div');
+      div.className = 'comment';
+      div.style.position = 'relative';
+      div.innerHTML = `
+        <b>${comment.userName}</b>: ${comment.text}
+        <button class="menu-btn comment-menu-btn" title="Options">&#x22EE;</button>
+        <div class="menu-content comment-menu-content">
+          ${comment.userEmail === currentUser.email ? `<button class="delete-comment-btn" data-postid="${postId}" data-index="${i}">ডিলিট</button>` : ''}
+        </div>
+        <div class="replies-container" id="replies-${postId}-${i}"></div>
+      `;
+      commentsContainer.appendChild(div);
+    });
+
+    // Add comment input
+    const inputDiv = document.createElement('div');
+    inputDiv.style.marginTop = '10px';
+    inputDiv.innerHTML = `
+      <input type="text" id="newCommentInput-${postId}" placeholder="কমেন্ট লিখুন..." style="width: 70%; padding: 5px;" />
+      <button id="btnAddComment-${postId}">কমেন্ট করুন</button>
+    `;
+    commentsContainer.appendChild(inputDiv);
+
+    document.getElementById(`btnAddComment-${postId}`).onclick = () => {
+      const input = document.getElementById(`newCommentInput-${postId}`);
+      const text = input.value.trim();
+      if (!text) return alert('কমেন্ট লিখুন');
+      addComment(postId, text);
+      input.value = '';
+    };
+
+    // Attach comment menu
+    document.querySelectorAll('.comment .comment-menu-btn').forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        toggleMenu(btn.nextElementSibling);
+      };
+    });
+
+    // Delete comment
+    document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        const postId = Number(btn.dataset.postid);
+        const index = Number(btn.dataset.index);
+        if (confirm('আপনি কি এই কমেন্ট ডিলিট করতে চান?')) {
+          deleteComment(postId, index);
+        }
+        closeAllMenus();
+      };
+    });
+
+    // Load replies for each comment
+    post.comments.forEach((comment, i) => {
+      loadReplies(postId, i, comment.replies || []);
+    });
+  }
+
+  function addComment(postId, text) {
+    const posts = JSON.parse(localStorage.getItem(STORAGE_POSTS) || '[]');
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+    post.comments.push({ userEmail: currentUser.email, userName: currentUser.name, text, replies: [] });
+    localStorage.setItem(STORAGE_POSTS, JSON.stringify(posts));
+    loadComments(postId);
+    addNotification(`${currentUser.name} একটি পোস্টে কমেন্ট করেছেন`);
+  }
+
+  function deleteComment(postId, index) {
+    const posts = JSON.parse(localStorage.getItem(STORAGE_POSTS) || '[]');
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+    post.comments.splice(index, 1);
+    localStorage.setItem(STORAGE_POSTS, JSON.stringify(posts));
+    loadComments(postId);
+  }
+
+  // --- REPLIES ---
+
+  function loadReplies(postId, commentIndex, replies) {
+    const repliesContainer = $(`replies-${postId}-${commentIndex}`);
+    if (!repliesContainer) return;
+    repliesContainer.innerHTML = '';
+
+    replies.forEach((reply, idx) => {
+      const div = document.createElement('div');
+      div.className = 'reply';
+      div.style.position = 'relative';
+      div.innerHTML = `
+        <b>${reply.userName}</b>: ${reply.text}
+        <button class="menu-btn reply-menu-btn" title="Options">&#x22EE;</button>
+        <div class="menu-content reply-menu-content">
+          ${reply.userEmail === currentUser.email ? `<button class="delete-reply-btn" data-postid="${postId}" data-commentindex="${commentIndex}" data-index="${idx}">ডিলিট</button>` : ''}
+        </div>
+      `;
+      repliesContainer.appendChild(div);
+    });
+
+    // Attach reply menu
+    repliesContainer.querySelectorAll('.reply-menu-btn').forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        toggleMenu(btn.nextElementSibling);
+      };
+    });
+
+    // Delete reply
+    repliesContainer.querySelectorAll('.delete-reply-btn').forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        const postId = Number(btn.dataset.postid);
+        const commentIndex = Number(btn.dataset.commentindex);
+        const idx = Number(btn.dataset.index);
+        if (confirm('আপনি কি এই রিপ্লাই ডিলিট করতে চান?')) {
+          deleteReply(postId, commentIndex, idx);
+        }
+        closeAllMenus();
+      };
+    });
+  }
+
+  function deleteReply(postId, commentIndex, idx) {
+    const posts = JSON.parse(localStorage.getItem(STORAGE_POSTS) || '[]');
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+    if (!post.comments[commentIndex].replies) return;
+    post.comments[commentIndex].replies.splice(idx, 1);
+    localStorage.setItem(STORAGE_POSTS, JSON.stringify(posts));
+    loadComments(postId);
+  }
+
+  // --- FRIEND REQUESTS ---
+
+  $('btnSendFriendRequest').addEventListener('click', () => {
+    const friendEmail = $('friendEmailInput').value.trim().toLowerCase();
+    if (!friendEmail) return alert('ইমেইল দিন');
+    if (friendEmail === currentUser.email) return alert('নিজেকে রিকোয়েস্ট পাঠানো যাবে না');
+
+    const users = loadUsers();
+    const friend = users.find(u => u.email === friendEmail);
+    if (!friend) return alert('ব্যবহারকারী পাওয়া যায়নি');
+
+    let requests = JSON.parse(localStorage.getItem(STORAGE_FRIEND_REQUESTS) || '{}');
+    requests[friendEmail] = requests[friendEmail] || [];
+    if (requests[friendEmail].includes(currentUser.email)) return alert('আপনি ইতিমধ্যে রিকোয়েস্ট পাঠিয়েছেন');
+
+    requests[friendEmail].push(currentUser.email);
+    localStorage.setItem(STORAGE_FRIEND_REQUESTS, JSON.stringify(requests));
+    $('friendEmailInput').value = '';
+    alert('রিকোয়েস্ট পাঠানো হয়েছে');
+    loadFriendRequests();
+    addNotification(`${currentUser.name} একটি বন্ধু রিকোয়েস্ট পাঠিয়েছেন`);
+  });
+
+  function loadFriendRequests() {
+    const friendRequestList = $('friendRequestList');
+    friendRequestList.innerHTML = '';
+    let requests = JSON.parse(localStorage.getItem(STORAGE_FRIEND_REQUESTS) || '{}');
+    let myRequests = requests[currentUser.email] || [];
+
+    if (myRequests.length === 0) {
+      friendRequestList.innerHTML = '<p>কোনো রিকোয়েস্ট নেই</p>';
+      return;
+    }
+
+    const users = loadUsers();
+    myRequests.forEach(reqEmail => {
+      const user = users.find(u => u.email === reqEmail);
+      if (!user) return;
+      const div = document.createElement('div');
+      div.className = 'friend-request';
+      div.innerHTML = `
+        <b>${user.name}</b> থেকে রিকোয়েস্ট এসেছে
+        <button class="btn-accept" data-email="${reqEmail}">গ্রহণ করুন</button>
+        <button class="btn-decline" data-email="${reqEmail}">বাতিল করুন</button>
+      `;
+      friendRequestList.appendChild(div);
+    });
+
+    friendRequestList.querySelectorAll('.btn-accept').forEach(btn => {
+      btn.onclick = () => {
+        acceptFriendRequest(btn.dataset.email);
+      };
+    });
+    friendRequestList.querySelectorAll('.btn-decline').forEach(btn => {
+      btn.onclick = () => {
+        declineFriendRequest(btn.dataset.email);
+      };
+    });
+  }
+
+  function acceptFriendRequest(email) {
+    let requests = JSON.parse(localStorage.getItem(STORAGE_FRIEND_REQUESTS) || '{}');
+    let friends = JSON.parse(localStorage.getItem(STORAGE_FRIENDS) || '{}');
+    friends[currentUser.email] = friends[currentUser.email] || [];
+    friends[email] = friends[email] || [];
+
+    if (!friends[currentUser.email].includes(email)) friends[currentUser.email].push(email);
+    if (!friends[email].includes(currentUser.email)) friends[email].push(currentUser.email);
+
+    localStorage.setItem(STORAGE_FRIENDS, JSON.stringify(friends));
+
+    // Remove request
+    requests[currentUser.email] = requests[currentUser.email].filter(e => e !== email);
+    localStorage.setItem(STORAGE_FRIEND_REQUESTS, JSON.stringify(requests));
+
+    loadFriendRequests();
+    loadFriends();
+    addNotification(`${currentUser.name} এবং ${getUserByEmail(email)?.name} এখন বন্ধু`);
+  }
+
+  function declineFriendRequest(email) {
+    let requests = JSON.parse(localStorage.getItem(STORAGE_FRIEND_REQUESTS) || '{}');
+    requests[currentUser.email] = requests[currentUser.email].filter(e => e !== email);
+    localStorage.setItem(STORAGE_FRIEND_REQUESTS, JSON.stringify(requests));
+    loadFriendRequests();
+  }
+
+  function loadFriends() {
+    const friendList = $('friendList');
+    friendList.innerHTML = '';
+    const friends = JSON.parse(localStorage.getItem(STORAGE_FRIENDS) || '{}');
+    const myFriends = friends[currentUser.email] || [];
+    const users = loadUsers();
+    if (myFriends.length === 0) {
+      friendList.innerHTML = '<p>আপনার কোনো বন্ধু নেই</p>';
+      return;
+    }
+    myFriends.forEach(email => {
+      const user = users.find(u => u.email === email);
+      if (!user) return;
+      const div = document.createElement('div');
+      div.className = 'friend';
+      div.innerHTML = `
+        <img src="${user.profilePic || 'https://via.placeholder.com/40'}" alt="profile" class="profile-pic" style="width:30px; height:30px;" />
+        <b>${user.name}</b>
+        <button class="btn-friend" data-email="${email}">চ্যাট করুন</button>
+      `;
+      friendList.appendChild(div);
+    });
+    friendList.querySelectorAll('.btn-friend').forEach(btn => {
+      btn.onclick = () => {
+        const friendEmail = btn.dataset.email;
+        openChat(friendEmail);
+      };
+    });
+  }
+
+  // --- CHAT ---
+
+  function renderFriendChatSelect() {
+    const chatFriendSelect = $('chatFriendSelect');
+    chatFriendSelect.innerHTML = '';
+    const friends = JSON.parse(localStorage.getItem(STORAGE_FRIENDS) || '{}');
+    const myFriends = friends[currentUser.email] || [];
+    const users = loadUsers();
+    if (myFriends.length === 0) {
+      chatFriendSelect.innerHTML = '<p>কোনো বন্ধু নেই চ্যাট করার জন্য</p>';
+      $('chatBox').classList.add('hidden');
+      return;
+    }
+    myFriends.forEach(email => {
+      const user = users.find(u => u.email === email);
+      if (!user) return;
+      const btn = document.createElement('button');
+      btn.className = 'btn-friend';
+      btn.innerText = user.name;
+      btn.dataset.email = email;
+      btn.onclick = () => openChat(email);
+      chatFriendSelect.appendChild(btn);
+    });
+  }
+
+  function openChat(friendEmail) {
+    currentChatFriend = friendEmail;
+    $('chatBox').classList.remove('hidden');
+    const users = loadUsers();
+    const friendUser = users.find(u => u.email === friendEmail);
+    if (!friendUser) return;
+
+    // Show chat header with friend's name
+    $('chatBox').querySelector('h3')?.remove();
+    const h3 = document.createElement('h3');
+    h3.innerText = 'Messenger - ' + friendUser.name;
+    $('chatBox').prepend(h3);
+
+    loadChatMessages(friendEmail);
+  }
+
+  function loadChatMessages(friendEmail) {
+    const chatMessages = $('chatMessages');
+    chatMessages.innerHTML = '';
+    const chats = JSON.parse(localStorage.getItem(STORAGE_CHATS) || '{}');
+    const key1 = `${currentUser.email}_${friendEmail}`;
+    const key2 = `${friendEmail}_${currentUser.email}`;
+    let messages = chats[key1] || chats[key2] || [];
+    messages.sort((a,b) => a.timestamp - b.timestamp);
+
+    messages.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = 'chat-message ' + (msg.sender === currentUser.email ? 'self' : 'other');
+      div.innerText = msg.text;
+      // ৩ ডট মেনু for chat message
+      div.style.position = 'relative';
+      const menuBtn = document.createElement('button');
+      menuBtn.className = 'menu-btn';
+      menuBtn.title = 'Options';
+      menuBtn.innerHTML = '&#x22EE;';
+      menuBtn.style.position = 'absolute';
+      menuBtn.style.top = '5px';
+      menuBtn.style.right = '5px';
+      menuBtn.style.fontSize = '18px';
+      div.appendChild(menuBtn);
+
+      const menuContent = document.createElement('div');
+      menuContent.className = 'menu-content';
+      const delBtn = document.createElement('button');
+      delBtn.innerText = 'ডিলিট';
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        if(confirm('আপনি কি এই মেসেজ ডিলিট করতে চান?')) {
+          deleteChatMessage(currentUser.email, friendEmail, msg.id);
+          closeAllMenus();
+        }
+      };
+      menuContent.appendChild(delBtn);
+      div.appendChild(menuContent);
+
+      menuBtn.onclick = e => {
+        e.stopPropagation();
+        toggleMenu(menuContent);
+      };
+
+      chatMessages.appendChild(div);
+    });
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function deleteChatMessage(sender, receiver, msgId) {
+    const chats = JSON.parse(localStorage.getItem(STORAGE_CHATS) || '{}');
+    const key1 = `${sender}_${receiver}`;
+    const key2 = `${receiver}_${sender}`;
+    let messages = chats[key1] || chats[key2] || [];
+    messages = messages.filter(m => m.id !== msgId);
+    if(chats[key1]) chats[key1] = messages;
+    else chats[key2] = messages;
+    localStorage.setItem(STORAGE_CHATS, JSON.stringify(chats));
+    loadChatMessages(receiver);
+  }
+
+  $('btnSendChat').addEventListener('click', () => {
+    const text = $('chatInput').value.trim();
+    if (!text || !currentChatFriend) return;
+    const chats = JSON.parse(localStorage.getItem(STORAGE_CHATS) || '{}');
+    const key1 = `${currentUser.email}_${currentChatFriend}`;
+    const key2 = `${currentChatFriend}_${currentUser.email}`;
+    let messages = chats[key1] || chats[key2] || [];
+    const msg = {
+      id: Date.now(),
+      sender: currentUser.email,
+      text,
+      timestamp: Date.now()
+    };
+    messages.push(msg);
+    if(chats[key1]) chats[key1] = messages;
+    else chats[key2] = messages;
+    localStorage.setItem(STORAGE_CHATS, JSON.stringify(chats));
+    $('chatInput').value = '';
+    loadChatMessages(currentChatFriend);
+    addNotification(`${currentUser.name} একটি মেসেজ পাঠিয়েছেন ${getUserByEmail(currentChatFriend)?.name} কে`);
+  });
+
+  // --- NOTIFICATIONS ---
+
+  function addNotification(text) {
+    const notifications = JSON.parse(localStorage.getItem(STORAGE_NOTIFICATIONS) || '[]');
+    notifications.unshift({ id: Date.now(), text, timestamp: Date.now() });
+    if (notifications.length > 50) notifications.pop();
+    localStorage.setItem(STORAGE_NOTIFICATIONS, JSON.stringify(notifications));
+    loadNotifications();
+  }
+
+  function loadNotifications() {
+    const notificationList = $('notificationList');
+    notificationList.innerHTML = '';
+    const notifications = JSON.parse(localStorage.getItem(STORAGE_NOTIFICATIONS) || '[]');
+    if (notifications.length === 0) {
+      notificationList.innerHTML = '<p>কোনো নোটিফিকেশন নেই</p>';
+      return;
+    }
+    notifications.forEach(n => {
+      const div = document.createElement('div');
+      div.className = 'notification';
+      div.innerText = `${new Date(n.timestamp).toLocaleString()}: ${n.text}`;
+      notificationList.appendChild(div);
+    });
+  }
+
+  // --- INIT ---
+
+  function init() {
+    const loggedUser = loadLoggedUser();
+    if (loggedUser) {
+      currentUser = loggedUser;
+      renderApp();
+    }
+  }
+
+  init();
+
+})();
+</script>
+</body>
+</html>
